@@ -1,12 +1,4 @@
-/// # Sample
-/// Estimating Frequency for Shor's algorithm
-///
-/// # Description
-/// In this sample we concentrate on costing the `EstimateFrequency`
-/// operation, which is the core quantum operation in Shor's algorithm, and
-/// we omit the classical pre- and post-processing. This makes it ideal for
-/// use with the Azure Quantum Resource Estimator.
-namespace grovers{
+namespace Grovers {
     import Std.Arrays.ForEach;
     open Microsoft.Quantum.Arrays;
     open Microsoft.Quantum.Canon;
@@ -18,6 +10,7 @@ namespace grovers{
     open Microsoft.Quantum.Unstable.Arithmetic;
     open Microsoft.Quantum.ResourceEstimation;
 
+     
     @EntryPoint()
     operation RunProgram() : Result[] {
        return SixGroverRun(6, [true,false,true,false,true,false]);
