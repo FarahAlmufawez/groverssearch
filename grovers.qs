@@ -7,6 +7,7 @@
 /// we omit the classical pre- and post-processing. This makes it ideal for
 /// use with the Azure Quantum Resource Estimator.
 namespace grovers{
+    import Std.Arrays.ForEach;
     open Microsoft.Quantum.Arrays;
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Convert;
@@ -18,29 +19,24 @@ namespace grovers{
     open Microsoft.Quantum.ResourceEstimation;
 
     @EntryPoint()
-    operation RunProgram() : Unit {
-    let pattern : Bool[] = [true, false, true, false, true, false];
-    let repeats : Int = 6;
-    SixGroverRun(repeats, pattern);
-}
-    operation GateSwitch(target: Qubit[], pattern: Bool[]) : Unit {
-    // loop through each qubit and apply Puli-X gate if paterrn is true
-    for i in 0..5 {
-        if (pattern[i]){
-            X(target[i]);
-        }
+    operation RunProgram() : Result[] {
+       return SixGroverRun(6, [true,false,true,false,true,false]);
+        
     }
-    
-}
-operation SelectorSix(target: Qubit[], pattern: Bool[]) : Unit {
-    //step 1 : apply Gateswich which represent puli-X
-    GateSwitch(target,pattern);
-    //step 2 : apply controlled z in all qubit controlling tha last one 
-    Controlled Z(target[0..4],target[5]);
-    //step 3 : apply Gateswich to get the orginal state
-    GateSwitch(target,pattern)
-    
-}
+
+    operation GateSwitch(target: Qubit[], pattern: Bool[]) : Unit {
+        for i in 0..Length(pattern) - 1 {
+            if pattern[i] {
+                X(target[i]); 
+            }
+        }     
+    }
+
+    operation SelectorSix(target: Qubit[], pattern: Bool[]) : Unit {
+        GateSwitch(target, pattern); 
+        Controlled Z(target[0..4],target[5]); 
+        GateSwitch(target, pattern); 
+    }
 operation AmplifySix(target: Qubit[]) : Unit {
  // step 1 : apply hadamard and puli-x gate to each qubit 
    for i in 0..5 {
@@ -84,12 +80,12 @@ operation RandomiseSix(target: Qubit[]) : Unit {
     } 
     
 }
-operation SixGroverRun(repeats: Int, pattern: Bool[]) : Unit {
-    use q = Qubit[6];
-    RandomiseSix(q);
-    SixQGrovers(q, pattern, repeats);
- let measured = ForEach(MResetZ, q);
- Message($"Measured result: {measured}");
-      
-}
+    operation SixGroverRun(repeats: Int, pattern: Bool[]) : Result[] {
+        use q = Qubit[6];
+        RandomiseSix(q);
+        SixQGrovers(q, pattern, repeats);
+        //DumpMachine();
+        //ResetAll(q);
+        return MResetEachZ(q); 
+    }
 }
